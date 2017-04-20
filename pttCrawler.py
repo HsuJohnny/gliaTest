@@ -27,6 +27,7 @@ def get_articles(dom):
         	href = d.find('a')['href']
         	title = d.find('a').string
         else:
+            href=''
         	title=''
         articles.append({
     	    'date':date,
