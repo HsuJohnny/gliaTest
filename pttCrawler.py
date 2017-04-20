@@ -1,5 +1,8 @@
 from bs4 import BeautifulSoup
 import requests
+
+PTT_URL = 'https://www.ptt.cc'
+
 def get_web_page(url):
     resp = requests.get(
         url=url,
@@ -21,18 +24,30 @@ def get_articles(dom):
         date = d.find('div', 'date').string
         author = d.find('div', 'author').string
         if d.find('a'):			
+        	href = d.find('a')['href']
         	title = d.find('a').string
         else:
         	title=''
         articles.append({
     	    'date':date,
     	    'author':author,
-    	    'title':title
+    	    'title':title,
+    	    'href':href
     	    })
-    return main_title, articles
+    return main_title, articles     
 
-page = get_web_page('https://www.ptt.cc/bbs/Beauty/index.html')
-if page:  
-    title,current_articles = get_articles(page)
-    for post in current_articles:
-        print(post)
+if __name__ == '__main__':
+    page = get_web_page('https://www.ptt.cc/bbs/Beauty/index.html')
+    if page:
+        main_title, articles = get_articles(page)
+        print (main_title)
+        for article in articles:
+            content = get_web_page(PTT_URL + article['href'])
+            soup = BeautifulSoup(content, 'html.parser')
+            if content: 
+                richcontent = soup.find('div', 'richcontent')
+                if richcontent:
+                    words = richcontent.string
+                    article['content']=words
+    print (articles)
+
